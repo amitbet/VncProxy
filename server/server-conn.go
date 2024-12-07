@@ -33,6 +33,9 @@ type ServerConn struct {
 	// Width of the frame buffer in pixels, sent to the client.
 	fbWidth uint16
 
+	// Flag indicating if the connection is shared with other clients
+	shared bool
+
 	// The pixel format associated with the connection. This shouldn't
 	// be modified. If you wish to set a new pixel format, use the
 	// SetPixelFormat method.
@@ -145,6 +148,14 @@ func (c *ServerConn) SetWidth(w uint16) {
 }
 func (c *ServerConn) SetHeight(h uint16) {
 	c.fbHeight = h
+}
+
+func (c *ServerConn) SetShared(shared bool) {
+	c.shared = shared
+}
+
+func (c *ServerConn) IsShared() bool {
+	return c.shared
 }
 
 func (c *ServerConn) handle() error {

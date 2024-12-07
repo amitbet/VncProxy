@@ -25,7 +25,7 @@ type VncProxy struct {
 	sessionManager   *SessionManager
 }
 
-func (vp *VncProxy) createClientConnection(target string, vncPass string) (*client.ClientConn, error) {
+func (vp *VncProxy) createClientConnection(target string, vncPass string, shared bool) (*client.ClientConn, error) {
 	var (
 		nc  net.Conn
 		err error
@@ -48,7 +48,7 @@ func (vp *VncProxy) createClientConnection(target string, vncPass string) (*clie
 	clientConn, err := client.NewClientConn(nc,
 		&client.ClientConfig{
 			Auth:      authArr,
-			Exclusive: true,
+			Exclusive: !shared, // Use the shared flag from the client
 		})
 
 	if err != nil {
@@ -100,7 +100,7 @@ func (vp *VncProxy) newServerConnHandler(cfg *server.ServerConfig, sconn *server
 			target = session.TargetHostname + ":" + session.TargetPort
 		}
 
-		cconn, err := vp.createClientConnection(target, session.TargetPassword)
+		cconn, err := vp.createClientConnection(target, session.TargetPassword, sconn.IsShared())
 		if err != nil {
 			session.Status = SessionStatusError
 			logger.Errorf("Proxy.newServerConnHandler error creating connection: %s", err)

@@ -346,10 +346,7 @@ func ServerClientInitHandler(cfg *ServerConfig, c *ServerConn) error {
 	if err := binary.Read(c, binary.BigEndian, &shared); err != nil {
 		return err
 	}
-	/* TODO
-	if shared != 1 {
-		c.SetShared(false)
-	}
-	*/
+	isShared := (shared & 1) != 0
+	c.SetShared(isShared)
 	return nil
 }

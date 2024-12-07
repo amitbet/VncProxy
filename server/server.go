@@ -89,6 +89,11 @@ func attachNewServerConn(c io.ReadWriter, cfg *ServerConfig, sessionId string) e
 		return err
 	}
 
+	if err := ServerClientInitHandler(cfg, conn); err != nil {
+		conn.Close()
+		return err
+	}
+
 	//run the handler for this new incoming connection from a vnc-client
 	//this is done before the init sequence to allow listening to server-init messages (and maybe even interception in the future)
 	err = cfg.NewConnHandler(cfg, conn)
@@ -97,10 +102,6 @@ func attachNewServerConn(c io.ReadWriter, cfg *ServerConfig, sessionId string) e
 		return err
 	}
 
-	if err := ServerClientInitHandler(cfg, conn); err != nil {
-		conn.Close()
-		return err
-	}
 
 	if err := ServerServerInitHandler(cfg, conn); err != nil {
 		conn.Close()
